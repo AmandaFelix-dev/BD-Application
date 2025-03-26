@@ -2,32 +2,47 @@ import sqlite3
 from datetime import datetime
 
 def criar_banco():
-    conn = sqlite3.connect('app.db')
+    conn = sqlite3.connect('hq_catalog.db')
     cursor = conn.cursor()
     
-    # Tabela Clientes
+    # Tabela Editoras
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS clientes (
+    CREATE TABLE IF NOT EXISTS editoras (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        email TEXT UNIQUE,
+        nome TEXT NOT NULL UNIQUE,
+        pais TEXT,
         data_cadastro TEXT DEFAULT CURRENT_TIMESTAMP
     )
     ''')
     
-    # Tabela Pedidos
+    # Tabela Séries
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS pedidos (
+    CREATE TABLE IF NOT EXISTS series (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        cliente_id INTEGER,
-        produto TEXT NOT NULL,
-        valor REAL NOT NULL,
-        data_pedido TEXT DEFAULT (datetime('now', 'localtime')),
-        FOREIGN KEY (cliente_id) REFERENCES clientes (id)
+        titulo TEXT NOT NULL,
+        editora_id INTEGER,
+        ano_lancamento INTEGER,
+        status TEXT CHECK(status IN ('Ativa', 'Concluída', 'Cancelada')),
+        FOREIGN KEY (editora_id) REFERENCES editoras (id)
     )
     ''')
     
-    # Tabela de logs
+    # Tabela Edições
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS edicoes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        serie_id INTEGER,
+        numero INTEGER NOT NULL,
+        titulo_edicao TEXT,
+        data_publicacao DATE,
+        preco_original REAL,
+        preco_atual REAL,
+        quantidade_estoque INTEGER DEFAULT 0,
+        FOREIGN KEY (serie_id) REFERENCES series (id)
+    )
+    ''')
+    
+    # Tabela de Logs
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,13 +54,23 @@ def criar_banco():
     )
     ''')
     
-    # Trigger para log de inserção de clientes
+    # Triggers
     cursor.execute('''
-    CREATE TRIGGER IF NOT EXISTS log_insert_cliente
-    AFTER INSERT ON clientes
+    CREATE TRIGGER IF NOT EXISTS log_nova_edicao
+    AFTER INSERT ON edicoes
     BEGIN
         INSERT INTO logs (tabela, operacao, id_registro, data_hora)
-        VALUES ('clientes', 'INSERT', NEW.id, datetime('now', 'localtime'));
+        VALUES ('edicoes', 'INSERT', NEW.id, datetime('now', 'localtime'));
+    END;
+    ''')
+    
+    cursor.execute('''
+    CREATE TRIGGER IF NOT EXISTS log_edicao_estoque
+    AFTER UPDATE OF quantidade_estoque ON edicoes
+    BEGIN
+        INSERT INTO logs (tabela, operacao, id_registro, data_hora, descricao)
+        VALUES ('edicoes', 'UPDATE', NEW.id, datetime('now', 'localtime'),
+               'Estoque alterado de ' || OLD.quantidade_estoque || ' para ' || NEW.quantidade_estoque);
     END;
     ''')
     
@@ -53,5 +78,5 @@ def criar_banco():
     conn.close()
 
 def escrever_log(mensagem):
-    with open('logs.log', 'a', encoding='utf-8') as f:
+    with open('hq_catalog.log', 'a', encoding='utf-8') as f:
         f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {mensagem}\n")

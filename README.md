@@ -1,4 +1,4 @@
-<h1 align="center">Projeto de Banco de Dados</h1>
+<h1 align="center">📰 Catálogo de HQs | Projeto de Banco de Dados</h1>
 
 <div align="center">
 Tecnologias e dependências utilizadas neste projeto:
@@ -10,12 +10,12 @@ Tecnologias e dependências utilizadas neste projeto:
 
 ## 📑 Sobre o Projeto
 
-Este projeto foi desenvolvido como aplicação de banco de dados relacional, utilizando:
+Este projeto é um sistema de catálogo de Histórias em Quadrinhos (HQs) desenvolvido como aplicação de banco de dados relacional, utilizando:
 
 - [Python](https://www.python.org/) versão 3.10+
 - [SQLite3](https://www.sqlite.org/index.html) como banco de dados embutido
 
-# 📑 Estrutura dos arquivos
+## 📑 Estrutura dos arquivos
 
 ```
 app_banco_dados/
@@ -25,3 +25,26 @@ app_banco_dados/
 ├── main.py           # Interface principal
 └── logs.log          # Arquivo de logs (será gerado automaticamente)
 ```
+
+## 📑 Funcionalidades Principais
+
+✔️ **Cadastro de Editoras**  
+✔️ **Gestão de Séries de HQs**  
+✔️ **Controle de Edições/Volumes**  
+✔️ **Sistema de Logs Automático**  
+✔️ **Relacionamentos entre tabelas**  
+✔️ **Interface de linha de comando intuitiva**
+
+
+## 📑 Como Executar na sua máquina
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/AmandaFelix-dev/BD-Application.git
+```
+2. Execute o sistema:
+```bash
+python main.py
+```
+
+<div align="center"> Feito por Amanda Felix 🦸‍♀️ </div>
